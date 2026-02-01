@@ -10,8 +10,13 @@ export class VotesController {
 
   @Post()
   async createVote(@Request() req: any, @Body() createVoteDto: CreateVoteDto) {
+    const userId = req.user?._id?.toString();
+    
+    // Fallback für lokale Entwicklung ohne Auth oder wenn req.user fehlt
+    const effectiveUserId = userId || 'anonymous_local_user';
+
     const vote = await this.votesService.createVote(
-      req.user._id.toString(),
+      effectiveUserId,
       createVoteDto.drucksacheId,
       createVoteDto.vote,
     );

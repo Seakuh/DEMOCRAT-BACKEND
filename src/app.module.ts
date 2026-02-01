@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { DrucksachenModule } from './drucksachen/drucksachen.module';
 import { VotesModule } from './votes/votes.module';
 import { SyncModule } from './sync/sync.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SyncModule } from './sync/sync.module';
     DrucksachenModule,
     VotesModule,
     SyncModule,
+    AiModule,
   ],
 })
 export class AppModule {}

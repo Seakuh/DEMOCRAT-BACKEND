@@ -8,7 +8,10 @@ export interface DrucksacheQuery {
   page?: number;
   limit?: number;
   ressort?: string;
+  category?: string;
   search?: string;
+  startDate?: string;
+  endDate?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
@@ -21,15 +24,28 @@ export class DrucksachenService {
   ) {}
 
   async findAll(query: DrucksacheQuery) {
-    const { page = 1, limit = 10, ressort, search, sortBy = 'datum', sortOrder = 'desc' } = query;
+    const { page = 1, limit = 10, ressort, category, search, startDate, endDate, sortBy = 'datum', sortOrder = 'desc' } = query;
     const skip = (page - 1) * limit;
 
     const filter: any = {};
     if (ressort) {
       filter.ressort = ressort;
     }
+    if (category) {
+      filter.category = category;
+    }
     if (search) {
-      filter.$text = { $search: search };
+      filter.$or = [
+        { titel: { $regex: search, $options: 'i' } },
+        { abstract: { $regex: search, $options: 'i' } },
+        { dokumentnummer: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (startDate || endDate) {
+      filter.datum = {};
+      if (startDate) filter.datum.$gte = new Date(startDate);
+      if (endDate) filter.datum.$lte = new Date(endDate);
     }
 
     const sort: any = {};
@@ -101,11 +117,42 @@ export class DrucksachenService {
     return ressorts.filter((r) => r != null);
   }
 
+  async getCategories(): Promise<string[]> {
+    const categories = await this.drucksacheModel.distinct('category').exec();
+    return categories.filter((c) => c != null);
+  }
+
   async upsertDrucksache(data: Partial<Drucksache>): Promise<DrucksacheDocument> {
     return this.drucksacheModel.findOneAndUpdate(
       { dipId: data.dipId },
       { $set: data },
       { upsert: true, new: true },
     ).exec();
+  }
+
+  async findUnprocessed(limit = 10): Promise<DrucksacheDocument[]> {
+    return this.drucksacheModel
+      .find({
+        aiProcessed: { $ne: true },
+        pdfUrl: { $exists: true, $nin: [null, ''] },
+      })
+      .sort({ datum: -1 })
+      .limit(limit)
+      .exec();
+  }
+
+  async updateAiFields(
+    dipId: string,
+    updates: {
+      summary?: string;
+      category?: string;
+      qdrantPointId?: string;
+      aiProcessed?: boolean;
+      aiProcessedAt?: Date;
+    },
+  ): Promise<DrucksacheDocument | null> {
+    return this.drucksacheModel
+      .findOneAndUpdate({ dipId }, { $set: updates }, { new: true })
+      .exec();
   }
 }

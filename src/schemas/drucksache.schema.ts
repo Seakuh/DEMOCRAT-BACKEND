@@ -37,6 +37,22 @@ export class Drucksache {
 
   @Prop()
   dokumentnummer: string;
+
+  // AI-generierte Felder
+  @Prop()
+  summary: string;
+
+  @Prop()
+  category: string;
+
+  @Prop()
+  qdrantPointId: string;
+
+  @Prop({ default: false })
+  aiProcessed: boolean;
+
+  @Prop()
+  aiProcessedAt: Date;
 }
 
 export const DrucksacheSchema = SchemaFactory.createForClass(Drucksache);
@@ -44,3 +60,5 @@ export const DrucksacheSchema = SchemaFactory.createForClass(Drucksache);
 DrucksacheSchema.index({ ressort: 1 });
 DrucksacheSchema.index({ datum: -1 });
 DrucksacheSchema.index({ titel: 'text', abstract: 'text' });
+DrucksacheSchema.index({ aiProcessed: 1 });
+DrucksacheSchema.index({ category: 1 });

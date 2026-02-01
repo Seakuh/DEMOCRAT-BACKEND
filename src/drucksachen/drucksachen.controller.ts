@@ -5,6 +5,11 @@ import { DrucksachenService, DrucksacheQuery } from './drucksachen.service';
 export class DrucksachenController {
   constructor(private drucksachenService: DrucksachenService) {}
 
+  @Get('search')
+  async search(@Query('q') q: string, @Query() query: DrucksacheQuery) {
+    return this.drucksachenService.findAll({ ...query, search: q });
+  }
+
   @Get()
   async findAll(@Query() query: DrucksacheQuery) {
     return this.drucksachenService.findAll(query);
@@ -13,6 +18,11 @@ export class DrucksachenController {
   @Get('ressorts')
   async getRessorts() {
     return this.drucksachenService.getRessorts();
+  }
+
+  @Get('categories')
+  async getCategories() {
+    return this.drucksachenService.getCategories();
   }
 
   @Get(':id')
