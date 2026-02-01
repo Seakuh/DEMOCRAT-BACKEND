@@ -8,6 +8,7 @@ import { DrucksachenModule } from './drucksachen/drucksachen.module';
 import { VotesModule } from './votes/votes.module';
 import { SyncModule } from './sync/sync.module';
 import { AiModule } from './ai/ai.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AiModule } from './ai/ai.module';
     VotesModule,
     SyncModule,
     AiModule,
+    NewsModule,
   ],
 })
 export class AppModule {}

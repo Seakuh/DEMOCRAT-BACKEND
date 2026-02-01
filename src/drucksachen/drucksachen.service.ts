@@ -269,7 +269,7 @@ export class DrucksachenService {
       return `${yyyy}${mm}${dd}`;
     };
   
-    tagesordnungen.sort((a, b) => toSortKey(a.date).localeCompare(toSortKey(b.date)));
+    tagesordnungen.sort((a, b) => toSortKey(b.date).localeCompare(toSortKey(a.date)));
   
     return { tagesordnungen };
   }
