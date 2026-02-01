@@ -25,6 +25,11 @@ export class DrucksachenController {
     return this.drucksachenService.getCategories();
   }
 
+  @Get('conferences')
+  async getConferences() {
+    return this.drucksachenService.getConferences();
+  }
+
   @Get(':id')
   async findById(@Param('id') id: string) {
     const drucksache = await this.drucksachenService.findById(id);
