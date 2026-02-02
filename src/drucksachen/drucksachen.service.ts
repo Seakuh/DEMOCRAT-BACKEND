@@ -43,6 +43,8 @@ export interface DrucksacheQuery {
 
 @Injectable()
 export class DrucksachenService {
+  private cachedConferences: ConferencesJson | null = null;
+  private lastFetchDate: string | null = null;
 
   constructor(
     @InjectModel(Drucksache.name) private drucksacheModel: Model<DrucksacheDocument>,
@@ -206,6 +208,12 @@ export class DrucksachenService {
   }
   
   async getConferences(): Promise<ConferencesJson> {
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (this.cachedConferences && this.lastFetchDate === today) {
+      return this.cachedConferences;
+    }
+
     const res = await fetch(ENDPOINT, {
       headers: {
         // XML endpoint, aber Accept egal
@@ -271,7 +279,11 @@ export class DrucksachenService {
   
     tagesordnungen.sort((a, b) => toSortKey(b.date).localeCompare(toSortKey(a.date)));
   
-    return { tagesordnungen };
+    const result = { tagesordnungen };
+    this.cachedConferences = result;
+    this.lastFetchDate = today;
+
+    return result;
   }
   
 
